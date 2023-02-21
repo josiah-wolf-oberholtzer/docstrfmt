@@ -188,7 +188,7 @@ class Visitor(CSTTransformer):
             single_line = len(output.splitlines()) == 1
             original_strip = original_node.evaluated_value.rstrip(" ")
             end_line_count = len(original_strip) - len(original_strip.rstrip("\n"))
-            ending = "" if single_line else "\n\n" if self._blank_line else "\n"
+            ending = "" if single_line else "\n" if self._blank_line else ""
             if single_line:
                 correct_ending = 0 == end_line_count
             else:
@@ -208,7 +208,7 @@ class Visitor(CSTTransformer):
                     1,
                 )
                 value = indent(
-                    f'{original_node.prefix}"""{output}{ending}"""', " " * indent_level
+                    f'{original_node.prefix}"""\n{output}{ending}\n"""', " " * indent_level
                 ).lstrip()
                 updated_node = updated_node.with_changes(value=value)
             if self._last_assign:

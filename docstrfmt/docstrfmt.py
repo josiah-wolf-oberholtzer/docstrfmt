@@ -383,6 +383,23 @@ class Formatters:
             text = "\n".join(chain(self._format_children(node, context)))
             yield from self._with_spaces(4, text.splitlines())
 
+    def container(self, node: docutils.nodes.container, context) -> line_iterator:
+        classes = node.attributes["classes"]
+        yield f".. container:: {' '.join(classes)}"
+        yield ""
+        context = context.indent(4)
+        if node.children:
+            yield from self._with_spaces(
+                4,
+                self._chain_with_line_separator(
+                    "",
+                    (
+                        self.manager.perform_format(child, context)
+                        for child in node.children
+                    ),
+                ),
+            )
+
     def definition(self, node: docutils.nodes.definition, context) -> line_iterator:
         yield from self._chain_with_line_separator(
             "", self._format_children(node, context)
@@ -686,7 +703,10 @@ class Formatters:
             if class_type != "code"
         ]
         language = languages[0] if languages else None
-        yield f".. code-block::{f' {language}' if language else ''}"
+        if language:
+            yield f".. code-block::{language}"
+        else:
+            yield "::"
         yield ""
         text = "".join(chain(self._format_children(node, context)))
 
